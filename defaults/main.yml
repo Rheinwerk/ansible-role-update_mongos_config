@@ -7,12 +7,12 @@ _mongos :
   user: mongodb
   group: mongodb
   port: 27017
-  ssl:
-    pemkeyfile: etc/mongos.pem
-    pemkeypassword: secret
-    mode: requireSSL
-    cafile: /etc/ssl/certs/ca-certificates.crt
-    allow_connections_without_certificates: true
+#  ssl:
+#    pemkeyfile: etc/mongos.pem
+#    pemkeypassword: secret
+#    mode: requireSSL
+#    cafile: /etc/ssl/certs/ca-certificates.crt
+#    allow_connections_without_certificates: "true"
   sharding:
     configdb:
       replicaset_name: configsrv
