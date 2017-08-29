@@ -1,0 +1,21 @@
+# vim: ft=ansible:et:ts=2
+
+- name: Create Mongos log directory
+	file: path="{{ _mongos.log_path }}" state=directory owner="{{ _mongos.user }}" group="{{ _mongos.group }}" mode=0750
+
+- name: Create Mongos logrotate config file
+	template: src="etc/logrotate.d/mongos.j2" dest="/etc/logrotate.d/mongos" owner=root group=root mode=0644
+
+- name: Create Mongos config file
+	template: src="etc/mongos.conf.j2" dest="/etc/mongos.conf" owner=root group=root mode=644
+
+- name: Create Mongos startup script
+	template: src="etc/init/mongos.conf.j2" dest="/etc/init/mongos.conf" owner=root group=root mode=0644
+
+- name: Copy Mongos SSL PEMKeyFile
+	copy: src="{{ _mongos.ssl.pemkeyfile }}" dest="/{{ _mongos.ssl.pemkeyfile }}" owner=root group="{{ _mongos.group }}" mode=640
+  when: _mongos.ssl is defined and _mongos.ssl.pemkeyfile is defined
+
+- name: Disable Service Autostart
+	service: name="mongos" enabled=no
+

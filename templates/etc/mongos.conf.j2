@@ -1,0 +1,34 @@
+# mongos.conf
+
+systemLog:
+  destination: file
+  path: {{ _mongos.log_path }}/mongos.log
+  logAppend: true
+  logRotate: reopen
+
+processManagement:
+  pidFilePath: /var/run/mongos.pid
+
+net:
+  bindIp: {{ _mongos.bind_ip|default("127.0.0.1") }}
+  port: {{ _mongos.port }}
+
+sharding:
+  configDB: {{ _mongos.sharding.configdb.replicaset_name}}/{{ _mongos.sharding.configdb.members|join(",")}}
+
+security:
+  clusterAuthMode: x509
+
+{% if _mongos.ssl is defined %}
+net:
+  ssl:
+    # _Only_ allow connections via SSL, regardless of user
+    # authentication mechanism
+    mode: {{ _mongos.ssl.mode|default("requireSSL") }}
+    PEMKeyFile: /{{ _mongos.ssl.pemkeyfile }}
+    PEMKeyPassword: {{ _mongos.ssl.pemkeypassword }}
+    CAFile: {{ _mongos.ssl.cafile|default("/etc/ssl/certs/ca-certificates.crt") }}
+    # Allows clients to auth with user/password, as long at they
+    # come in via SSL
+    allowConnectionsWithoutCertificates: {{ _mongos.ssl.allow_connections_without_certificates|default("true") }}
+{% endif %}
