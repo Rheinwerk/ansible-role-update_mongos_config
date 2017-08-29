@@ -37,7 +37,7 @@ Including an example of how to use your role (for instance, with variables passe
         MONGOS:
           ...
       roles:
-         - { role: update_mongos_config, tags: [ 'mongos' ], _mongos: "{{ MONGOSG }}" }
+         - { role: update_mongos_config, tags: [ 'mongos' ], _mongos: "{{ MONGOS }}" }
 
 License
 -------
