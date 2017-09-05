@@ -12,9 +12,16 @@
 - name: Create Mongos startup script
   template: src="etc/init/mongos.conf.j2" dest="/etc/init/mongos.conf" owner=root group=root mode=0644
 
-- name: Copy Mongos SSL PEMKeyFile
-  copy: src="{{ _mongos.ssl.pemkeyfile }}" dest="/{{ _mongos.ssl.pemkeyfile }}" owner=root group="{{ _mongos.group }}" mode=640
-  when: _mongos.ssl is defined and _mongos.ssl.pemkeyfile is defined
+- block:
+    - name: Copy Mongos SSL PEMKeyFile
+      copy: src="{{ _mongos.ssl.pemkeyfile }}" dest="/{{ _mongos.ssl.pemkeyfile }}" owner=root group="{{ _mongos.group }}" mode=640
+      when: _mongos.ssl.pemkeyfile is defined
+
+    - name: Add certificate location to glob file
+      lineinfile: dest="{{ _mongos.ssl.cert_glob_file }}" owner=root group=root mode=0644 create=yes line="/{{ _mongos.ssl.pemkeyfile }}"
+      when: _mongos.ssl.pemkeyfile is defined and _mongos.ssl.cert_glob_file is defined
+
+  when: _mongos.ssl is defined
 
 - name: Disable Service Autostart
   service: name="mongos" enabled=no

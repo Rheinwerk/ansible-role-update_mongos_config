@@ -13,6 +13,7 @@ _mongos :
 #    mode: requireSSL
 #    cafile: /etc/ssl/certs/ca-certificates.crt
 #    allow_connections_without_certificates: "true"
+#    cert_glob_file: /etc/cert_globs
   sharding:
     configdb:
       replicaset_name: configsrv
