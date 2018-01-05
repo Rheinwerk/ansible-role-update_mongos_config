@@ -12,6 +12,7 @@ processManagement:
 net:
   bindIp: {{ _mongos.bind_ip|default("127.0.0.1") }}
   port: {{ _mongos.port }}
+  maxIncomingConnections: {{ _mongos.max_connections }}
 
 sharding:
   configDB: {{ _mongos.sharding.configdb.replicaset_name}}/{{ _mongos.sharding.configdb.members|join(",")}}
