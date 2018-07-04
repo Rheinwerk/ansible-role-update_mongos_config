@@ -1,7 +1,7 @@
 # vim: ft=ansible:et:ts=2
 ---
 
-_mongos :
+_mongos:
   log_path: /var/log/mongodb
 # User and group must exist
   user: mongodb
@@ -20,4 +20,3 @@ _mongos :
       replicaset_name: configsrv
       members:
         - "mongo-config:27019"
-

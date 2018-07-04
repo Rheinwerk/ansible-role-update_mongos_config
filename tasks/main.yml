@@ -25,4 +25,3 @@
 
 - name: Disable Service Autostart
   service: name="mongos" enabled=no
-
