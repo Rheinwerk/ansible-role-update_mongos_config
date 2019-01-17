@@ -8,11 +8,6 @@
     sharedscripts
     create 640 {{ _mongos.user }} {{ _mongos.group }}
     postrotate
-        find {{ _mongos.log_path }} -type f \
-            -size 0 \
-            -regextype posix-awk \
-            -regex "^.*mongos\.log\.[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}$" \
-            -delete
         /bin/kill -SIGUSR1 `cat /var/run/mongos.pid 2> /dev/null` 2> /dev/null || true
     endscript
 }
