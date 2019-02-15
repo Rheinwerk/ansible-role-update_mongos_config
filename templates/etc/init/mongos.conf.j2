@@ -14,7 +14,7 @@ pre-start script
   DAEMONUSER=${DAEMONUSER:-{{_mongos.user}}}
   DAEMONGROUP=${DAEMONGROUP:-{{ _mongos.group }}}
 
-  if [ ! -d {{ _mongos.log_path }}; then
+  if [ ! -d {{ _mongos.log_path }} ]; then
     mkdir -p {{ _mongos.log_path }} && chown ${DAEMONUSER}:${DAEMONGROUP} {{ _mongos.log_path }}
   fi
   touch /var/run/mongos.pid
