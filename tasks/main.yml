@@ -1,5 +1,8 @@
 # vim: ft=ansible:et:ts=2
 
+- set_fact:
+    is_ubuntu1804: "{{ ansible_distribution_version == '18.04' }}"
+
 - name: Create Mongos log directory
   file: path="{{ _mongos.log_path }}" state=directory owner="{{ _mongos.user }}" group="{{ _mongos.group }}" mode=0750
 
@@ -14,9 +17,11 @@
 
 - name: Create Mongos systemd script
   template: src="etc/systemd/system/mongos.service.j2" dest="/etc/systemd/system/mongos.service" owner=root group="{{ _mongos.group }}" mode=0750
+  when: is_ubuntu1804
 
 - name: Create Mongos systemd helper script
   template: src="usr/local/bin/mongos-pre-start.sh.j2" dest="/usr/local/bin/mongos-pre-start.sh" owner=root group="{{ _mongos.group }}" mode=0750
+  when: is_ubuntu1804
 
 - block:
     - name: Copy Mongos SSL PEMKeyFile
@@ -28,9 +33,6 @@
       when: _mongos.ssl.pemkeyfile is defined and _mongos.ssl.cert_glob_file is defined
 
   when: _mongos.ssl is defined
-
-- set_fact:
-    is_ubuntu1804: "{{ ansible_distribution_version == '18.04' }}"
 
 - name: Disable Service Autostart
   systemd: name="mongos" enabled=no no_block=true
