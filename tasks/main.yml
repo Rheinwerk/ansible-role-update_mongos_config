@@ -12,6 +12,12 @@
 - name: Create Mongos startup script
   template: src="etc/init/mongos.conf.j2" dest="/etc/init/mongos.conf" owner=root group=root mode=0644
 
+- name: Create Mongos systemd script
+  template: src="etc/systemd/system/mongos.service.j2" dest="/etc/systemd/system/mongos.service" owner=root group="{{ _mongos.group }}" mode=0750
+
+- name: Create Mongos systemd helper script
+  template: src="usr/local/bin/mongos-pre-start.sh.j2" dest="/usr/local/bin/mongos-pre-start.sh" owner=root group="{{ _mongos.group }}" mode=0750
+
 - block:
     - name: Copy Mongos SSL PEMKeyFile
       copy: src="{{ _mongos.ssl.pemkeyfile }}" dest="/{{ _mongos.ssl.pemkeyfile }}" owner=root group="{{ _mongos.group }}" mode=0640
@@ -23,5 +29,13 @@
 
   when: _mongos.ssl is defined
 
+- set_fact:
+    is_ubuntu1804: "{{ ansible_distribution_version == '18.04' }}"
+
+- name: Disable Service Autostart
+  systemd: name="mongos" enabled=no no_block=true
+  when: is_ubuntu1804
+
 - name: Disable Service Autostart
   service: name="mongos" enabled=no
+  when: not is_ubuntu1804

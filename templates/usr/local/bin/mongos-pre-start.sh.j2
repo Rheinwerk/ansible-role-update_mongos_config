@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+if [ ! -d {{ _mongos.log_path }}; then
+  mkdir -p {{ _mongos.log_path }} && chown {{_mongos.user}}:{{ _mongos.group }} {{ _mongos.log_path }}
+fi
+

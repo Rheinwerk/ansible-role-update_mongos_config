@@ -1,0 +1,38 @@
+[Unit]
+Description=MongoS Client
+Documentation=https://docs.mongodb.org/manual
+After=network.target
+
+[Service]
+Type=simple
+
+User={{_mongos.user}}
+Group={{ _mongos.group }}
+
+# Recommended ulimit values for mongod or mongos
+# See http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
+#
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=64000
+# processes/threads
+LimitNPROC=64000
+# locked memory
+LimitMEMLOCK=infinity
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+
+PermissionsStartOnly=true
+
+ExecStartPre=/usr/local/bin/mongos-pre-start.sh
+ExecStart=/usr/bin/mongos --config /etc/mongos.conf
+
+[Install]
+WantedBy=multi-user.target
+
