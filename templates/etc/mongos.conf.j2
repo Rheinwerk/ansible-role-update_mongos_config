@@ -6,8 +6,10 @@ systemLog:
   logAppend: true
   logRotate: reopen
 
+{% if ansible_distribution_version == '14.04' %}
 processManagement:
   pidFilePath: /var/run/mongos.pid
+{% endif %}
 
 net:
   bindIp: {{ _mongos.bind_ip|default("127.0.0.1") }}
