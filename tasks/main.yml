@@ -16,11 +16,11 @@
   template: src="etc/init/mongos.conf.j2" dest="/etc/init/mongos.conf" owner=root group=root mode=0644
 
 - name: Create Mongos systemd script
-  template: src="etc/systemd/system/mongos.service.j2" dest="/etc/systemd/system/mongos.service" owner=root group="{{ _mongos.group }}" mode=0750
+  template: src="etc/systemd/system/mongos.service.j2" dest="/etc/systemd/system/mongos.service" owner=root group="{{ _mongos.group }}" mode=0644
   when: is_ubuntu1804
 
 - name: Create Mongos systemd helper script
-  template: src="usr/local/bin/mongos-pre-start.sh.j2" dest="/usr/local/bin/mongos-pre-start.sh" owner=root group="{{ _mongos.group }}" mode=0750
+  template: src="usr/local/bin/mongos-pre-start.sh.j2" dest="/usr/local/bin/mongos-pre-start.sh" owner=root group="{{ _mongos.group }}" mode=0754
   when: is_ubuntu1804
 
 - block:
