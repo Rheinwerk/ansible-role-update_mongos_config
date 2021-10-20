@@ -6,7 +6,7 @@ systemLog:
   logAppend: true
   logRotate: reopen
 
-{% if ansible_distribution_version == '14.04' %}
+{% if ansible_service_mgr == 'upstart' %}
 processManagement:
   pidFilePath: /var/run/mongos.pid
 {% endif %}
