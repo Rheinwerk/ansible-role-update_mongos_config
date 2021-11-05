@@ -35,7 +35,7 @@ ExecStart=/usr/bin/mongos --config /etc/mongos.conf
 
 # logrotate needs pidfile to send USR1 signal after rotation
 ExecStartPost=/usr/bin/sh -c "/usr/bin/echo -n $MAINPID > /var/run/mongos.pid"
-ExecStopPost=rm /var/run/mongos.pid
+ExecStopPost=/usr/bin/rm /var/run/mongos.pid
 
 [Install]
 WantedBy=multi-user.target
