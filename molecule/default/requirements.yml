@@ -1,3 +1,5 @@
 - src: https://github.com/Rheinwerk/ansible-role-mongos.git
   name: mongos
+  # WIP
+  version: gh-actions-molecule
   scm: git
