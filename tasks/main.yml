@@ -23,15 +23,6 @@
     group: root
     mode: 0644
 
-- name: Create Mongos startup script
-  template:
-    src: "etc/init/mongos.conf.j2"
-    dest: "/etc/init/mongos.conf"
-    owner: root
-    group: root
-    mode: 0644
-  when: ansible_service_mgr == "upstart"
-
 - name: Create Mongos systemd script
   template:
     src: "etc/systemd/system/mongos.service.j2"
@@ -39,9 +30,11 @@
     owner: root
     group: "{{ _mongos.group }}"
     mode: 0644
-  when: ansible_service_mgr == "systemd"
   notify:
     - Reload systemd daemon
+
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Create Mongos systemd helper script
   template:
@@ -50,7 +43,6 @@
     owner: root
     group: "{{ _mongos.group }}"
     mode: 0754
-  when: ansible_service_mgr == "systemd"
 
 - name: Configure Mongo SSL
   when: _mongos.ssl is defined
@@ -78,10 +70,3 @@
   systemd:
     name: "mongos"
     enabled: no
-  when: ansible_service_mgr == "systemd"
-
-- name: Disable Service Autostart
-  service:
-    name: "mongos"
-    enabled: no
-  when: ansible_service_mgr == "upstart"
