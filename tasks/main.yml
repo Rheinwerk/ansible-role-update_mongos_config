@@ -1,45 +1,72 @@
 # vim: ft=ansible:et:ts=2
 - name: Create Mongos log directory
-  file: path="{{ _mongos.log_path }}" state=directory owner="{{ _mongos.user }}" group="{{ _mongos.group }}" mode=0750
+  file:
+    path: "{{ _mongos.log_path }}"
+    state: directory
+    owner: "{{ _mongos.user }}"
+    group: "{{ _mongos.group }}"
+    mode: 0750
 
 - name: Create Mongos logrotate config file
-  template: src="etc/logrotate.d/mongos.j2" dest="/etc/logrotate.d/mongos" owner=root group=root mode=0644
+  template:
+    src: "etc/logrotate.d/mongos.j2"
+    dest: "/etc/logrotate.d/mongos"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create Mongos config file
-  template: src="etc/mongos.conf.j2" dest="/etc/mongos.conf" owner=root group=root mode=0644
-
-- name: Create Mongos startup script
-  template: src="etc/init/mongos.conf.j2" dest="/etc/init/mongos.conf" owner=root group=root mode=0644
+  template:
+    src: "etc/mongos.conf.j2"
+    dest: "/etc/mongos.conf"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create Mongos systemd script
-  template: src="etc/systemd/system/mongos.service.j2" dest="/etc/systemd/system/mongos.service" owner=root group="{{ _mongos.group }}" mode=0644
-  when: ansible_service_mgr == "systemd"
-  register: systemd_unit_written
+  template:
+    src: "etc/systemd/system/mongos.service.j2"
+    dest: "/etc/systemd/system/mongos.service"
+    owner: root
+    group: "{{ _mongos.group }}"
+    mode: 0644
+  notify:
+    - Reload systemd daemon
 
-- name: Reload systemd daemon
-  systemd:
-    daemon_reload: yes
-  when: systemd_unit_written.changed
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Create Mongos systemd helper script
-  template: src="usr/local/bin/mongos-pre-start.sh.j2" dest="/usr/local/bin/mongos-pre-start.sh" owner=root group="{{ _mongos.group }}" mode=0754
-  when: ansible_service_mgr == "systemd"
+  template:
+    src: "usr/local/bin/mongos-pre-start.sh.j2"
+    dest: "/usr/local/bin/mongos-pre-start.sh"
+    owner: root
+    group: "{{ _mongos.group }}"
+    mode: 0754
 
-- block:
+- name: Configure Mongo SSL
+  when: _mongos.ssl is defined
+  block:
     - name: Copy Mongos SSL PEMKeyFile
-      copy: src="{{ _mongos.ssl.pemkeyfile }}" dest="/{{ _mongos.ssl.pemkeyfile }}" owner=root group="{{ _mongos.group }}" mode=0640
+      copy:
+        src: "{{ _mongos.ssl.pemkeyfile }}"
+        dest: "/{{ _mongos.ssl.pemkeyfile }}"
+        owner: root
+        group: "{{ _mongos.group }}"
+        mode: 0640
       when: _mongos.ssl.pemkeyfile is defined
 
     - name: Add certificate location to glob file
-      lineinfile: dest="{{ _mongos.ssl.cert_glob_file }}" owner=root group=root mode=0644 create=yes line="/{{ _mongos.ssl.pemkeyfile }}"
+      lineinfile:
+        dest: "{{ _mongos.ssl.cert_glob_file }}"
+        owner: root
+        group: root
+        mode: 0644
+        create: yes
+        line: "/{{ _mongos.ssl.pemkeyfile }}"
       when: _mongos.ssl.pemkeyfile is defined and _mongos.ssl.cert_glob_file is defined
 
-  when: _mongos.ssl is defined
-
 - name: Disable Service Autostart
-  systemd: name="mongos" enabled=no no_block=true
-  when: ansible_service_mgr == "systemd"
-
-- name: Disable Service Autostart
-  service: name="mongos" enabled=no
-  when: ansible_service_mgr == "upstart"
+  systemd:
+    name: "mongos"
+    enabled: no
