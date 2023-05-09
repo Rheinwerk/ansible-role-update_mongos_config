@@ -1,6 +1,6 @@
 # vim: ft=ansible:et:ts=2
 - name: Create Mongos log directory
-  file:
+  ansible.builtin.file:
     path: "{{ _mongos.log_path }}"
     state: directory
     owner: "{{ _mongos.user }}"
@@ -8,7 +8,7 @@
     mode: 0750
 
 - name: Create Mongos logrotate config file
-  template:
+  ansible.builtin.template:
     src: "etc/logrotate.d/mongos.j2"
     dest: "/etc/logrotate.d/mongos"
     owner: root
@@ -16,7 +16,7 @@
     mode: 0644
 
 - name: Create Mongos config file
-  template:
+  ansible.builtin.template:
     src: "etc/mongos.conf.j2"
     dest: "/etc/mongos.conf"
     owner: root
@@ -24,7 +24,7 @@
     mode: 0644
 
 - name: Create Mongos systemd script
-  template:
+  ansible.builtin.template:
     src: "etc/systemd/system/mongos.service.j2"
     dest: "/etc/systemd/system/mongos.service"
     owner: root
@@ -34,10 +34,10 @@
     - Reload systemd daemon
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Create Mongos systemd helper script
-  template:
+  ansible.builtin.template:
     src: "usr/local/bin/mongos-pre-start.sh.j2"
     dest: "/usr/local/bin/mongos-pre-start.sh"
     owner: root
@@ -48,7 +48,7 @@
   when: _mongos.ssl is defined
   block:
     - name: Copy Mongos SSL PEMKeyFile
-      copy:
+      ansible.builtin.copy:
         src: "{{ _mongos.ssl.pemkeyfile }}"
         dest: "/{{ _mongos.ssl.pemkeyfile }}"
         owner: root
@@ -57,7 +57,7 @@
       when: _mongos.ssl.pemkeyfile is defined
 
     - name: Add certificate location to glob file
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: "{{ _mongos.ssl.cert_glob_file }}"
         owner: root
         group: root
@@ -67,6 +67,6 @@
       when: _mongos.ssl.pemkeyfile is defined and _mongos.ssl.cert_glob_file is defined
 
 - name: Disable Service Autostart
-  systemd:
+  ansible.builtin.systemd:
     name: "mongos"
     enabled: no
