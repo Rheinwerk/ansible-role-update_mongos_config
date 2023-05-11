@@ -4,8 +4,8 @@
   become: yes
   become_user: root
   pre_tasks:
-    - file: name="/etc/logrotate.d" state=directory owner="root" group="root" mode="0755"
-    - group: name="mongodb" system=yes state=present
-    - user: name="mongodb" system=yes group="mongodb" state=present createhome=no
+    - ansible.builtin.file: name="/etc/logrotate.d" state=directory owner="root" group="root" mode="0755"
+    - ansible.builtin.group: name="mongodb" system=yes state=present
+    - ansible.builtin.user: name="mongodb" system=yes group="mongodb" state=present createhome=no
   roles:
     - ansible-role-update_mongos_config
