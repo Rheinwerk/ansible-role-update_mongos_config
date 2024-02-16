@@ -6,11 +6,6 @@ systemLog:
   logAppend: true
   logRotate: reopen
 
-{% if ansible_service_mgr == 'upstart' %}
-processManagement:
-  pidFilePath: /var/run/mongos.pid
-{% endif %}
-
 net:
   bindIp: {{ _mongos.bind_ip|default("127.0.0.1") }}
   port: {{ _mongos.port }}
@@ -22,16 +17,16 @@ sharding:
 security:
   clusterAuthMode: x509
 
-{% if _mongos.ssl is defined %}
+{% if _mongos.tls is defined %}
 net:
-  ssl:
-    # _Only_ allow connections via SSL, regardless of user
+  tls:
+    # _Only_ allow connections via TLS, regardless of user
     # authentication mechanism
-    mode: {{ _mongos.ssl.mode|default("requireSSL") }}
-    PEMKeyFile: /{{ _mongos.ssl.pemkeyfile }}
-    PEMKeyPassword: {{ _mongos.ssl.pemkeypassword }}
-    CAFile: {{ _mongos.ssl.cafile|default("/etc/ssl/certs/ca-certificates.crt") }}
+    mode: {{ _mongos.tls.mode|default("requireTLS") }}
+    certificateKeyFile: /{{ _mongos.tls.certificatekeyfile }}
+    certificateKeyFilePassword: {{ _mongos.tls.certificatekeyfilepassword }}
+    CAFile: {{ _mongos.tls.cafile|default("/etc/ssl/certs/ca-certificates.crt") }}
     # Allows clients to auth with user/password, as long at they
-    # come in via SSL
-    allowConnectionsWithoutCertificates: {{ _mongos.ssl.allow_connections_without_certificates|default("true") }}
+    # come in via TLS
+    allowConnectionsWithoutCertificates: {{ _mongos.tls.allow_connections_without_certificates|default("true") }}
 {% endif %}

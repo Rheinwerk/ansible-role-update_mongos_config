@@ -8,10 +8,10 @@ _mongos:
   group: mongodb
   port: 27017
   max_connections: 1000
-#  ssl:
-#    pemkeyfile: etc/mongos.pem
-#    pemkeypassword: secret
-#    mode: requireSSL
+#  tls:
+#    certificatekeyfile: etc/mongos.pem
+#    certificatekeyfilepassword: secret
+#    mode: requireTLS
 #    cafile: /etc/ssl/certs/ca-certificates.crt
 #    allow_connections_without_certificates: "true"
 #    cert_glob_file: /etc/cert_globs
