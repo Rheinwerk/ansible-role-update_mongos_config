@@ -44,27 +44,27 @@
     group: "{{ _mongos.group }}"
     mode: 0754
 
-- name: Configure Mongo SSL
-  when: _mongos.ssl is defined
+- name: Configure Mongo TLS
+  when: _mongos.tls is defined
   block:
-    - name: Copy Mongos SSL PEMKeyFile
+    - name: Copy Mongos TLS certificateKeyFile
       ansible.builtin.copy:
-        src: "{{ _mongos.ssl.pemkeyfile }}"
-        dest: "/{{ _mongos.ssl.pemkeyfile }}"
+        src: "{{ _mongos.tls.certificatekeyfile }}"
+        dest: "/{{ _mongos.tls.certificatekeyfile }}"
         owner: root
         group: "{{ _mongos.group }}"
         mode: 0640
-      when: _mongos.ssl.pemkeyfile is defined
+      when: _mongos.tls.certificatekeyfile is defined
 
     - name: Add certificate location to glob file
       ansible.builtin.lineinfile:
-        dest: "{{ _mongos.ssl.cert_glob_file }}"
+        dest: "{{ _mongos.tls.cert_glob_file }}"
         owner: root
         group: root
         mode: 0644
         create: yes
-        line: "/{{ _mongos.ssl.pemkeyfile }}"
-      when: _mongos.ssl.pemkeyfile is defined and _mongos.ssl.cert_glob_file is defined
+        line: "/{{ _mongos.tls.certificatekeyfile }}"
+      when: _mongos.tls.certificatekeyfile is defined and _mongos.tls.cert_glob_file is defined
 
 - name: Disable Service Autostart
   ansible.builtin.systemd:
