@@ -5,7 +5,7 @@
     state: directory
     owner: "{{ _mongos.user }}"
     group: "{{ _mongos.group }}"
-    mode: 0750
+    mode: "0750"
 
 - name: Create Mongos logrotate config file
   ansible.builtin.template:
@@ -13,7 +13,7 @@
     dest: "/etc/logrotate.d/mongos"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Create Mongos config file
   ansible.builtin.template:
@@ -21,7 +21,7 @@
     dest: "/etc/mongos.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Create Mongos systemd script
   ansible.builtin.template:
@@ -29,7 +29,7 @@
     dest: "/etc/systemd/system/mongos.service"
     owner: root
     group: "{{ _mongos.group }}"
-    mode: 0644
+    mode: "0644"
   notify:
     - Reload systemd daemon
 
@@ -42,7 +42,7 @@
     dest: "/usr/local/bin/mongos-pre-start.sh"
     owner: root
     group: "{{ _mongos.group }}"
-    mode: 0754
+    mode: "0754"
 
 - name: Configure Mongo TLS
   when: _mongos.tls is defined
@@ -53,7 +53,7 @@
         dest: "/{{ _mongos.tls.certificatekeyfile }}"
         owner: root
         group: "{{ _mongos.group }}"
-        mode: 0640
+        mode: "0640"
       when: _mongos.tls.certificatekeyfile is defined
 
     - name: Add certificate location to glob file
@@ -61,7 +61,7 @@
         dest: "{{ _mongos.tls.cert_glob_file }}"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
         create: yes
         line: "/{{ _mongos.tls.certificatekeyfile }}"
       when: _mongos.tls.certificatekeyfile is defined and _mongos.tls.cert_glob_file is defined
