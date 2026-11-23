@@ -1,5 +1,6 @@
 #!/bin/bash -e
+{{ ansible_managed | comment }}
 
-if [ ! -d {{ _mongos.log_path }} ]; then
-  mkdir -p {{ _mongos.log_path }} && chown {{_mongos.user}}:{{ _mongos.group }} {{ _mongos.log_path }}
+if [ ! -d {{ _mongos_log_path }} ]; then
+  mkdir -p {{ _mongos_log_path }} && chown {{ _mongos_user }}:{{ _mongos_group }} {{ _mongos_log_path }}
 fi

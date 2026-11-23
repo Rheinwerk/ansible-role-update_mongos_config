@@ -1,22 +1,32 @@
-# vim: ft=ansible:et:ts=2
 ---
+# defaults file for ansible-role-update_mongos_config
 
-_mongos:
-  log_path: /var/log/mongodb
-# User and group must exist
-  user: mongodb
-  group: mongodb
-  port: 27017
-  max_connections: 1000
-#  tls:
-#    certificatekeyfile: etc/mongos.pem
-#    certificatekeyfilepassword: secret
-#    mode: requireTLS
-#    cafile: /etc/ssl/certs/ca-certificates.crt
-#    allow_connections_without_certificates: "true"
-#    cert_glob_file: /etc/cert_globs
-  sharding:
-    configdb:
-      replicaset_name: configsrv
-      members:
-        - "mongo-config:27019"
+# Directory of mongos.log; the role creates it for _mongos_user and _mongos_group
+_mongos_log_path: /var/log/mongodb
+
+# User and group mongos runs as; both must exist (the mongos install role creates them)
+_mongos_user: mongodb
+_mongos_group: mongodb
+
+# Address and port mongos listens on (net.bindIp, net.port)
+_mongos_bind_ip: "127.0.0.1"
+_mongos_port: 27017
+
+# net.maxIncomingConnections
+_mongos_max_connections: 300
+
+# Config server replica set mongos routes to (sharding.configDB)
+_mongos_sharding:
+  configdb:
+    replicaset_name: configsrv
+    members:
+      - "mongo-config.service.centerdevice:27019"
+
+# TLS, {} disables it. certificatekeyfile is relative to the playbook's files/ and copied to
+# /<certificatekeyfile>; cert_glob_file (optional) gets that path as one line. Optional keys:
+# mode (default requireTLS), cafile (default /etc/ssl/certs/ca-certificates.crt) and
+# allow_connections_without_certificates (default true)
+_mongos_tls:
+  cert_glob_file: "{{ SITE.cert_glob_file }}"
+  certificatekeyfile: "etc/clientserver-mongo-server_combined.pem"
+  certificatekeyfilepassword: "{{ S_MONGOS.tls.certificatekeyfilepassword }}"

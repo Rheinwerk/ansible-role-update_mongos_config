@@ -1,0 +1,7 @@
+---
+# net.tls.mode values mongos accepts (tasks/assert.yml)
+_mongos_tls_modes:
+  - disabled
+  - allowTLS
+  - preferTLS
+  - requireTLS

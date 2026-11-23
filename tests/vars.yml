@@ -1,0 +1,4 @@
+---
+# No TLS key file in the molecule scenario; a non-default connection limit the verify playbook checks
+_mongos_tls: {}
+_mongos_max_connections: 123

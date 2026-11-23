@@ -1,0 +1,81 @@
+---
+argument_specs:
+  main:
+    short_description: Write the mongos config file, systemd unit, pre-start script and logrotate config; the service stays disabled
+    options:
+      _mongos_log_path:
+        type: str
+        description:
+          - Absolute path of the log directory; mongos writes mongos.log there.
+      _mongos_user:
+        type: str
+        description:
+          - User mongos runs as; it must exist.
+      _mongos_group:
+        type: str
+        description:
+          - Group mongos runs as; it must exist.
+      _mongos_bind_ip:
+        type: str
+        description:
+          - net.bindIp, one address or a comma-separated list.
+      _mongos_port:
+        type: int
+        description:
+          - net.port.
+      _mongos_max_connections:
+        type: int
+        description:
+          - net.maxIncomingConnections.
+      _mongos_sharding:
+        type: dict
+        description:
+          - Config server replica set mongos routes to.
+        options:
+          configdb:
+            type: dict
+            required: true
+            description:
+              - sharding.configDB, rendered as <replicaset_name>/<members joined by commas>.
+            options:
+              replicaset_name:
+                type: str
+                required: true
+                description:
+                  - Name of the config server replica set.
+              members:
+                type: list
+                elements: str
+                required: true
+                description:
+                  - host:port of the config server members.
+      _mongos_tls:
+        type: dict
+        description:
+          - TLS settings; an empty dict disables TLS. certificatekeyfile and certificatekeyfilepassword are required when it is not empty.
+        options:
+          certificatekeyfile:
+            type: str
+            description:
+              - Combined certificate and key, relative to the playbook's files/; copied to /<certificatekeyfile>.
+          certificatekeyfilepassword:
+            type: str
+            no_log: true
+            description:
+              - Password of the key in certificatekeyfile.
+          cert_glob_file:
+            type: str
+            description:
+              - Absolute path of a file that lists certificate files; the role adds /<certificatekeyfile> as one line.
+          mode:
+            type: str
+            description:
+              - net.tls.mode, one of disabled, allowTLS, preferTLS, requireTLS; default requireTLS.
+          cafile:
+            type: str
+            description:
+              - Absolute path of net.tls.CAFile; default /etc/ssl/certs/ca-certificates.crt.
+          allow_connections_without_certificates:
+            type: bool
+            description:
+              - net.tls.allowConnectionsWithoutCertificates; default true.

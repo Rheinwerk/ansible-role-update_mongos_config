@@ -1,32 +1,33 @@
+{{ ansible_managed | comment }}
 # mongos.conf
 
 systemLog:
   destination: file
-  path: {{ _mongos.log_path }}/mongos.log
+  path: {{ _mongos_log_path }}/mongos.log
   logAppend: true
   logRotate: reopen
 
 net:
-  bindIp: {{ _mongos.bind_ip|default("127.0.0.1") }}
-  port: {{ _mongos.port }}
-  maxIncomingConnections: {{ _mongos.max_connections }}
+  bindIp: {{ _mongos_bind_ip }}
+  port: {{ _mongos_port }}
+  maxIncomingConnections: {{ _mongos_max_connections }}
 
 sharding:
-  configDB: {{ _mongos.sharding.configdb.replicaset_name}}/{{ _mongos.sharding.configdb.members|join(",")}}
+  configDB: {{ _mongos_sharding.configdb.replicaset_name }}/{{ _mongos_sharding.configdb.members | join(",") }}
 
 security:
   clusterAuthMode: x509
 
-{% if _mongos.tls is defined %}
+{% if _mongos_tls | length > 0 %}
 net:
   tls:
     # _Only_ allow connections via TLS, regardless of user
     # authentication mechanism
-    mode: {{ _mongos.tls.mode|default("requireTLS") }}
-    certificateKeyFile: /{{ _mongos.tls.certificatekeyfile }}
-    certificateKeyFilePassword: {{ _mongos.tls.certificatekeyfilepassword }}
-    CAFile: {{ _mongos.tls.cafile|default("/etc/ssl/certs/ca-certificates.crt") }}
+    mode: {{ _mongos_tls.mode|default("requireTLS") }}
+    certificateKeyFile: /{{ _mongos_tls.certificatekeyfile }}
+    certificateKeyFilePassword: {{ _mongos_tls.certificatekeyfilepassword }}
+    CAFile: {{ _mongos_tls.cafile|default("/etc/ssl/certs/ca-certificates.crt") }}
     # Allows clients to auth with user/password, as long at they
     # come in via TLS
-    allowConnectionsWithoutCertificates: {{ _mongos.tls.allow_connections_without_certificates|default("true") }}
+    allowConnectionsWithoutCertificates: {{ _mongos_tls.allow_connections_without_certificates | default(true) | bool | lower }}
 {% endif %}
