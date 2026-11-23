@@ -1,3 +1,6 @@
+---
+# The install role the consumers pin; bump together with their pin
 - src: https://github.com/Rheinwerk/ansible-role-mongos.git
   name: mongos
   scm: git
+  version: v1.3.0

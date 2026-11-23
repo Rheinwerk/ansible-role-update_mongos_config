@@ -1,4 +1,5 @@
-{{ _mongos.log_path }}/mongos*.log {
+{{ ansible_managed | comment }}
+{{ _mongos_log_path }}/mongos*.log {
     daily
     rotate 30
     compress
@@ -6,7 +7,7 @@
     missingok
     notifempty
     sharedscripts
-    create 640 {{ _mongos.user }} {{ _mongos.group }}
+    create 640 {{ _mongos_user }} {{ _mongos_group }}
     postrotate
         /bin/kill -SIGUSR1 `cat /var/run/mongos.pid 2> /dev/null` 2> /dev/null || true
     endscript

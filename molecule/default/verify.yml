@@ -1,0 +1,78 @@
+---
+# tests/vars.yml sets _mongos_max_connections 123 and TLS with a placeholder key file
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read the rendered config files
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      loop:
+        - /etc/mongos.conf
+        - /etc/systemd/system/mongos.service
+        - /etc/logrotate.d/mongos
+      register: verify_files
+
+    - name: The config files are rendered from the variables
+      ansible.builtin.assert:
+        that:
+          - "'port: 27017' in files[0]"
+          - "'maxIncomingConnections: 123' in files[0]"
+          - "'configDB: configsrv/mongo-config.service.centerdevice:27019' in files[0]"
+          - "'path: /var/log/mongodb/mongos.log' in files[0]"
+          - "'certificateKeyFile: /etc/molecule-mongos.pem' in files[0]"
+          - "'mode: requireTLS' in files[0]"
+          - "'allowConnectionsWithoutCertificates: true' in files[0]"
+          - "'User=mongodb' in files[1]"
+          - "'create 640 mongodb mongodb' in files[2]"
+        fail_msg: "{{ files }}"
+      vars:
+        files: "{{ verify_files.results | map(attribute='content') | map('b64decode') | list }}"
+
+    - name: Read the glob file and the pre-start script
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      loop:
+        - /etc/cert_globs
+        - /usr/local/bin/mongos-pre-start.sh
+      register: verify_more
+
+    - name: The key file is listed in the glob file and the script starts with its shebang
+      ansible.builtin.assert:
+        that:
+          - "'/etc/molecule-mongos.pem' in files[0].splitlines()"
+          - files[1].splitlines()[0] == '#!/bin/bash -e'
+        fail_msg: "{{ files }}"
+      vars:
+        files: "{{ verify_more.results | map(attribute='content') | map('b64decode') | list }}"
+
+    - name: Read the key file
+      ansible.builtin.stat:
+        path: /etc/molecule-mongos.pem
+      register: verify_key
+
+    - name: The key file is readable by mongodb only
+      ansible.builtin.assert:
+        that:
+          - verify_key.stat.exists
+          - verify_key.stat.mode == '0640'
+          - verify_key.stat.gr_name == 'mongodb'
+
+    - name: Read the mongos log directory
+      ansible.builtin.stat:
+        path: /var/log/mongodb
+      register: verify_log_dir
+
+    - name: The log directory belongs to mongodb
+      ansible.builtin.assert:
+        that:
+          - verify_log_dir.stat.isdir
+          - verify_log_dir.stat.pw_name == 'mongodb'
+          - verify_log_dir.stat.gr_name == 'mongodb'
+
+    - name: Read whether mongos starts at boot
+      ansible.builtin.command: systemctl is-enabled mongos
+      register: verify_enabled
+      changed_when: false
+      failed_when: verify_enabled.stdout != 'disabled'

@@ -1,10 +1,15 @@
-# vim: ft=ansible:et:ts=2
+---
+- name: Assert
+  ansible.builtin.import_tasks: assert.yml
+  tags:
+    - always
+
 - name: Create Mongos log directory
   ansible.builtin.file:
-    path: "{{ _mongos.log_path }}"
+    path: "{{ _mongos_log_path }}"
     state: directory
-    owner: "{{ _mongos.user }}"
-    group: "{{ _mongos.group }}"
+    owner: "{{ _mongos_user }}"
+    group: "{{ _mongos_group }}"
     mode: "0750"
 
 - name: Create Mongos logrotate config file
@@ -28,7 +33,7 @@
     src: "etc/systemd/system/mongos.service.j2"
     dest: "/etc/systemd/system/mongos.service"
     owner: root
-    group: "{{ _mongos.group }}"
+    group: "{{ _mongos_group }}"
     mode: "0644"
   notify:
     - Reload systemd daemon
@@ -41,32 +46,31 @@
     src: "usr/local/bin/mongos-pre-start.sh.j2"
     dest: "/usr/local/bin/mongos-pre-start.sh"
     owner: root
-    group: "{{ _mongos.group }}"
+    group: "{{ _mongos_group }}"
     mode: "0754"
 
 - name: Configure Mongo TLS
-  when: _mongos.tls is defined
+  when: _mongos_tls | length > 0
   block:
     - name: Copy Mongos TLS certificateKeyFile
       ansible.builtin.copy:
-        src: "{{ _mongos.tls.certificatekeyfile }}"
-        dest: "/{{ _mongos.tls.certificatekeyfile }}"
+        src: "{{ _mongos_tls.certificatekeyfile }}"
+        dest: "/{{ _mongos_tls.certificatekeyfile }}"
         owner: root
-        group: "{{ _mongos.group }}"
+        group: "{{ _mongos_group }}"
         mode: "0640"
-      when: _mongos.tls.certificatekeyfile is defined
 
     - name: Add certificate location to glob file
       ansible.builtin.lineinfile:
-        dest: "{{ _mongos.tls.cert_glob_file }}"
+        dest: "{{ _mongos_tls.cert_glob_file }}"
         owner: root
         group: root
         mode: "0644"
-        create: yes
-        line: "/{{ _mongos.tls.certificatekeyfile }}"
-      when: _mongos.tls.certificatekeyfile is defined and _mongos.tls.cert_glob_file is defined
+        create: true
+        line: "/{{ _mongos_tls.certificatekeyfile }}"
+      when: _mongos_tls.cert_glob_file is defined
 
 - name: Disable Service Autostart
   ansible.builtin.systemd:
     name: "mongos"
-    enabled: no
+    enabled: false
