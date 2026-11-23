@@ -1,4 +1,14 @@
 ---
+# The dict of v0.x is gone; a play that still sets it would get the defaults without noticing
+- name: Assert the old _mongos dict is not set
+  ansible.builtin.assert:
+    that:
+      - _mongos is not defined
+    fail_msg: "_mongos (a dict) was replaced by the flat _mongos_* variables in v1.0.0, see the README"
+    quiet: true
+  tags:
+    - always
+
 - name: Assert the paths, user, group and listen settings
   ansible.builtin.assert:
     that:
@@ -10,10 +20,12 @@
       - _mongos_group is match('^[a-z_][a-z0-9_-]*\\Z')
       - _mongos_bind_ip is string
       - _mongos_bind_ip is match('^[^\\s,]+(,[^\\s,]+)*\\Z')
-      - _mongos_port | int == _mongos_port | float
+      - _mongos_port is not boolean
+      - _mongos_port | string is match('^[0-9]+\\Z')
       - _mongos_port | int >= 1
       - _mongos_port | int <= 65535
-      - _mongos_max_connections | int == _mongos_max_connections | float
+      - _mongos_max_connections is not boolean
+      - _mongos_max_connections | string is match('^[0-9]+\\Z')
       - _mongos_max_connections | int >= 1
     fail_msg: >-
       _mongos_log_path must be an absolute path without whitespace, _mongos_user and _mongos_group user and group names,
@@ -48,12 +60,12 @@
       - _mongos_tls is mapping
       - _mongos_tls | length == 0 or (_mongos_tls.certificatekeyfile is defined and _mongos_tls.certificatekeyfilepassword is defined)
       - _mongos_tls.certificatekeyfile is not defined or _mongos_tls.certificatekeyfile is match('^[^/\\s]\\S*\\Z')
-      - _mongos_tls.certificatekeyfilepassword is not defined or _mongos_tls.certificatekeyfilepassword is string
+      - _mongos_tls.certificatekeyfilepassword is not defined or (_mongos_tls.certificatekeyfilepassword | string | length > 0)
       - _mongos_tls.cert_glob_file is not defined or _mongos_tls.cert_glob_file is match('^/\\S+\\Z')
       - _mongos_tls.cafile is not defined or _mongos_tls.cafile is match('^/\\S+\\Z')
       - _mongos_tls.mode is not defined or _mongos_tls.mode in _mongos_tls_modes
     fail_msg: >-
-      _mongos_tls must be {} or have certificatekeyfile (a relative path without whitespace) and certificatekeyfilepassword (a string);
+      _mongos_tls must be {} or have certificatekeyfile (a relative path without whitespace) and certificatekeyfilepassword (not empty);
       cert_glob_file and cafile are absolute paths, mode one of {{ _mongos_tls_modes | join(', ') }}
     quiet: true
   tags:

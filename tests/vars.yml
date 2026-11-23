@@ -1,4 +1,8 @@
 ---
-# No TLS key file in the molecule scenario; a non-default connection limit the verify playbook checks
-_mongos_tls: {}
+# TLS like the consumers, with a placeholder key file from molecule/default/files and a non-default
+# connection limit; the verify playbook checks both
 _mongos_max_connections: 123
+_mongos_tls:
+  certificatekeyfile: etc/molecule-mongos.pem
+  certificatekeyfilepassword: molecule
+  cert_glob_file: /etc/cert_globs

@@ -22,7 +22,8 @@ Role Variables
 
 Every variable has a default (`defaults/main.yml`); set only the ones that differ.
 `meta/argument_specs.yml` and `tasks/assert.yml` check the values before anything
-is written, so a wrong type or an unknown key fails the run at the start.
+is written, so a wrong type, an unknown key inside `_mongos_sharding` or `_mongos_tls`,
+or the `_mongos` dict of v0.x fails the run at the start.
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -40,7 +41,7 @@ is written, so a wrong type or an unknown key fails the run at the start.
 | Key | Required | Description |
 | --- | --- | --- |
 | `certificatekeyfile` | yes | Combined certificate and key, relative to the playbook's `files/`; copied to `/<certificatekeyfile>`. |
-| `certificatekeyfilepassword` | yes | Password of the key. |
+| `certificatekeyfilepassword` | yes | Password of the key, not empty. |
 | `cert_glob_file` | no | Absolute path of a file that lists certificate files; the role adds `/<certificatekeyfile>`. |
 | `mode` | no | `net.tls.mode`: `disabled`, `allowTLS`, `preferTLS` or `requireTLS` (default). |
 | `cafile` | no | `net.tls.CAFile`, default `/etc/ssl/certs/ca-certificates.crt`. |
