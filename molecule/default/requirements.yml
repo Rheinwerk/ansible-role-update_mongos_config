@@ -3,4 +3,4 @@
 - src: https://github.com/Rheinwerk/ansible-role-mongos.git
   name: mongos
   scm: git
-  version: v1.3.0
+  version: v2.0.0
